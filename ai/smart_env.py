@@ -57,6 +57,73 @@ TOWER_CATALOG = [
     ("Farm 2-3-0 (Monkey Bank)", 4900, 60.0, 0.0, 0.0, 0, 99.0, 0, DMG_SHARP, 0.0, 0, 0, 420.0),
     ("Sniper 4-0-2 (Maim MOAB)", 6800, 999.0, 18.0, 35.0, 2, 1.35, 1, DMG_NORMAL, 0.0, 0, 0, 0.0),
 ]
+
+class SmartEnv:
+    def __init__(self, starting_cash=650.0):
+        self.towers = []
+        self.cash = starting_cash
+        self.tier5_registry = set() # Trava de Tier 5 único (ex: "DartMonkey_path0")
+
+    def upgrade_tower(self, tower_idx, path, cost):
+        """
+        Gere a evolução 5-2-0 a partir do Tier 0 e limite global de Tier 5.
+        """
+        tower = self.towers[tower_idx]
+        
+        # 1. Verifica saldo
+        if self.cash < cost:
+            return False, "Not enough cash"
+
+        # 2. Lógica Oficial de Crosspathing 5-2-0
+        active_paths = sum(1 for t in tower['tiers'] if t > 0)
+        
+        # Bloqueia o terceiro caminho
+        if tower['tiers'][path] == 0 and active_paths >= 2:
+            return False, "Crosspath locked (Max 2 paths)"
+            
+        # Bloqueia upar o secundário além do Tier 2 se já houver um Tier 3+
+        main_path = -1
+        for i, t in enumerate(tower['tiers']):
+            if t >= 3:
+                main_path = i
+                
+        if main_path != -1 and main_path != path:
+            if tower['tiers'][path] >= 2:
+                return False, "Secondary path capped at Tier 2"
+                
+        # 3. Trava Global de Tier 5
+        if tower['tiers'][path] == 4:
+            t5_id = f"{tower['type']}_path{path}"
+            if t5_id in self.tier5_registry:
+                return False, "Tier 5 already exists"
+            self.tier5_registry.add(t5_id)
+
+        # 4. Aplica o Upgrade
+        self.cash -= cost
+        tower['tiers'][path] += 1
+        tower['total_invested'] += cost
+        return True, "Upgrade successful"
+
+    def sell_tower(self, tower_idx):
+        """
+        Venda com Reembolso de 70% e liberação de Tiers 5.
+        """
+        if tower_idx >= len(self.towers):
+            return 0
+            
+        tower = self.towers.pop(tower_idx)
+        
+        # Reembolso de 70%
+        refund_amount = tower['total_invested'] * 0.70
+        self.cash += refund_amount
+        
+        # Se a torre vendida era Tier 5, libera a construção novamente
+        for i, t in enumerate(tower['tiers']):
+            if t == 5:
+                t5_id = f"{tower['type']}_path{i}"
+                self.tier5_registry.discard(t5_id)
+                
+        return refund_amount
 class BTD6TacticalEnv(gym.Env):
     """Ambiente v2.4 com Árvore 5-2-0, Venda 70%, Rondas 1-100 (DDT/BAD), Modo CHIMPS e Previsão."""
 

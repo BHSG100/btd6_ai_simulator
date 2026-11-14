@@ -1,5 +1,5 @@
 import numpy as np
-from numba import njit
+from numba import njit, int32, boolean
 
 # Bitmasks de Tipos de Dano e Imunidades
 DMG_SHARP = 1 << 0
@@ -14,6 +14,72 @@ TARGET_LAST = 1
 TARGET_CLOSE = 2
 TARGET_STRONG = 3
 
+FLAG_NONE      = 0
+FLAG_CAMO      = 1   # 00000001
+FLAG_LEAD      = 2   # 00000010
+FLAG_BLACK     = 4   # 00000100
+FLAG_PINK      = 8   # 00001000
+FLAG_FORTIFIED = 16  # 00010000
+FLAG_REGROW    = 32  # 00100000
+
+@njit(fastmath=True)
+def get_layer_hp(layer_type, flags):
+    """ Retorna o HP da próxima camada. Aplica Fortified se aplicável. """
+    base_hp = 1  # Bloons comuns
+    if layer_type == 10:  # Ex: Cerâmica
+        base_hp = 10
+    elif layer_type == 11:  # Ex: MOAB
+        base_hp = 200
+    elif layer_type == 14:  # Ex: DDT
+        base_hp = 400
+
+    # Dobro de vida para cascas Fortified
+    if (flags & FLAG_FORTIFIED):
+        base_hp *= 2
+        
+    return base_hp
+
+@njit(fastmath=True)
+def apply_damage_with_skip(projectile_damage, bloon_hp, bloon_layers, bloon_flags):
+    """
+    Core Engine Fix: Dano Residual (Layer Skipping).
+    Calcula penetração por múltiplas sub-camadas num único impacto.
+    Retorna (novo_hp, novas_camadas).
+    """
+    residual_damage = projectile_damage
+    
+    while residual_damage > 0 and bloon_layers > 0:
+        if residual_damage >= bloon_hp:
+            # Quebra a camada atual e guarda o troco
+            residual_damage -= bloon_hp
+            bloon_layers -= 1
+            
+            # Puxa o HP da próxima sub-camada (se ainda houver)
+            if bloon_layers > 0:
+                bloon_hp = get_layer_hp(bloon_layers, bloon_flags)
+            else:
+                bloon_hp = 0
+        else:
+            # Dano absorvido pela casca atual sem estourá-la
+            bloon_hp -= residual_damage
+            residual_damage = 0
+            
+    return bloon_hp, bloon_layers
+
+@njit
+def spawn_bloon_for_round(round_number, base_layer):
+    """ Configura os Bloons e DDTs baseados na ronda """
+    flags = FLAG_NONE
+    
+    # DDTs aparecem a partir da ronda 90
+    if round_number >= 90 and base_layer == 14: # 14 = DDT ID
+        flags = FLAG_CAMO | FLAG_LEAD | FLAG_BLACK | FLAG_PINK
+        if round_number >= 99: # DDTs Fortificados no round 99
+            flags |= FLAG_FORTIFIED
+            
+    # Lógica Regrow / Fortificada de rondas normais entraria aqui usando bitwise (|)
+    hp = get_layer_hp(base_layer, flags)
+    return hp, base_layer, flags
 
 @njit(fastmath=True, nogil=True, cache=True)
 def step_macro_ticks_jit(
