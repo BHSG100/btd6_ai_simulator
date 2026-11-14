@@ -1,0 +1,47 @@
+# ==========================================
+# PYTHON & AMBIENTE VIRTUAL
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.venv/
+venv/
+ENV/
+env/
+
+# ==========================================
+# COMPILAÇÃO & PYINSTALLER
+# ==========================================
+build/
+dist/
+*.spec
+
+# ==========================================
+# DADOS DE TREINAMENTO (MEMÓRIA E CHECKPOINTS)
+# ==========================================
+# Ignora os cofres binários pesados de memória e os temporários .tmp
+memory/*.npz
+memory/*.tmp
+
+# Ignora os replays de checkpoints e modelos PPO compactados (.zip)
+checkpoints/*.json
+checkpoints/*.zip
+checkpoints/*.tmp
+
+# ==========================================
+# IDEs, EDITORES & SISTEMA OPERACIONAL
+# ==========================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Windows & macOS OS files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+.DS_Store?
+._*

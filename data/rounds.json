@@ -1,0 +1,96 @@
+{
+  "rounds": [
+    {
+      "round_number": 1,
+      "end_of_round_cash": 101,
+      "groups": [
+        {
+          "bloon_id": "red",
+          "count": 20,
+          "start_time": 0.0,
+          "end_time": 17.5,
+          "camo": false
+        }
+      ]
+    },
+    {
+      "round_number": 2,
+      "end_of_round_cash": 102,
+      "groups": [
+        {
+          "bloon_id": "red",
+          "count": 35,
+          "start_time": 0.0,
+          "end_time": 22.0,
+          "camo": false
+        }
+      ]
+    },
+    {
+      "round_number": 3,
+      "end_of_round_cash": 103,
+      "groups": [
+        {
+          "bloon_id": "red",
+          "count": 25,
+          "start_time": 0.0,
+          "end_time": 18.0,
+          "camo": false
+        },
+        {
+          "bloon_id": "blue",
+          "count": 10,
+          "start_time": 5.0,
+          "end_time": 14.0,
+          "camo": false
+        }
+      ]
+    },
+    {
+      "round_number": 24,
+      "end_of_round_cash": 124,
+      "groups": [
+        {
+          "bloon_id": "blue",
+          "count": 20,
+          "start_time": 0.0,
+          "end_time": 10.0,
+          "camo": false
+        },
+        {
+          "bloon_id": "green",
+          "count": 1,
+          "start_time": 6.0,
+          "end_time": 6.0,
+          "camo": true
+        }
+      ]
+    },
+    {
+      "round_number": 28,
+      "end_of_round_cash": 128,
+      "groups": [
+        {
+          "bloon_id": "lead",
+          "count": 6,
+          "start_time": 0.0,
+          "end_time": 5.0,
+          "camo": false
+        }
+      ]
+    },
+    {
+      "round_number": 40,
+      "end_of_round_cash": 140,
+      "groups": [
+        {
+          "bloon_id": "moab",
+          "count": 1,
+          "start_time": 0.0,
+          "end_time": 0.0,
+          "camo": false
+        }
+      ]
+    }
+  ]
+}

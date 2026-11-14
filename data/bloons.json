@@ -1,0 +1,97 @@
+{
+  "bloons": {
+    "red": {
+      "numeric_id": 0,
+      "id": "red",
+      "base_hp": 1,
+      "speed": 2.5,
+      "rbe": 1,
+      "cash_reward": 1,
+      "is_moab_class": false,
+      "immunities": [],
+      "children": []
+    },
+    "blue": {
+      "numeric_id": 1,
+      "id": "blue",
+      "base_hp": 1,
+      "speed": 3.5,
+      "rbe": 2,
+      "cash_reward": 1,
+      "is_moab_class": false,
+      "immunities": [],
+      "children": [
+        {
+          "bloon_id": "red",
+          "count": 1
+        }
+      ]
+    },
+    "green": {
+      "numeric_id": 2,
+      "id": "green",
+      "base_hp": 1,
+      "speed": 4.5,
+      "rbe": 3,
+      "cash_reward": 1,
+      "is_moab_class": false,
+      "immunities": [],
+      "children": [
+        {
+          "bloon_id": "blue",
+          "count": 1
+        }
+      ]
+    },
+    "yellow": {
+      "numeric_id": 3,
+      "id": "yellow",
+      "base_hp": 1,
+      "speed": 8.0,
+      "rbe": 4,
+      "cash_reward": 1,
+      "is_moab_class": false,
+      "immunities": [],
+      "children": [
+        {
+          "bloon_id": "green",
+          "count": 1
+        }
+      ]
+    },
+    "lead": {
+      "numeric_id": 4,
+      "id": "lead",
+      "base_hp": 1,
+      "speed": 2.5,
+      "rbe": 23,
+      "cash_reward": 1,
+      "is_moab_class": false,
+      "immunities": [
+        "sharp"
+      ],
+      "children": [
+        {
+          "bloon_id": "yellow",
+          "count": 2
+        }
+      ]
+    },
+    "moab": {
+      "numeric_id": 5,
+      "id": "moab",
+      "base_hp": 200,
+      "speed": 2.5,
+      "rbe": 616,
+      "cash_reward": 1,
+      "is_moab_class": true,
+      "immunities": [],
+      "children": [
+        {
+          "bloon_id": "lead",
+          "count": 4
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "difficulty": "easy",
+  "target_round": 40,
+  "generation": 510,
+  "total_episodes_learned": 519680,
+  "best_fitness": 91170.81,
+  "best_round": 40,
+  "passed_level": true,
+  "cash_left": 17767.3,
+  "lives_left": 200,
+  "last_saved": "2026-11-14 16:39:39"
+}

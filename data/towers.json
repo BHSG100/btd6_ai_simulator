@@ -1,0 +1,1066 @@
+{
+  "towers": {
+    "dart_monkey": {
+      "id": "dart_monkey",
+      "category": "primary",
+      "role": "attacker",
+      "base_cost": 200,
+      "range_grid": 4.0,
+      "base_damage": 1,
+      "base_pierce": 2,
+      "cooldown_seconds": 0.95,
+      "blast_radius": 0.0,
+      "can_see_camo": false,
+      "damage_type": "sharp",
+      "footprint_radius": 0.5,
+      "upgrades": {
+        "top_path": [
+          {
+            "tier": 1,
+            "id": "sharp_shots",
+            "name": "Sharp Shots",
+            "cost": 140,
+            "pierce_delta": 1
+          },
+          {
+            "tier": 2,
+            "id": "razor_sharp_shots",
+            "name": "Razor Sharp Shots",
+            "cost": 220,
+            "pierce_delta": 2
+          },
+          {
+            "tier": 3,
+            "id": "spike_o_pult",
+            "name": "Spike-o-pult",
+            "cost": 320,
+            "damage_delta": 1,
+            "pierce_delta": 16,
+            "range_delta": 0.5,
+            "cooldown_multiplier": 1.15
+          },
+          {
+            "tier": 4,
+            "id": "juggernaut",
+            "name": "Juggernaut",
+            "cost": 1800,
+            "damage_delta": 1,
+            "pierce_delta": 34,
+            "blast_radius_delta": 1.0,
+            "cooldown_multiplier": 1.0
+          },
+          {
+            "tier": 5,
+            "id": "ultra_juggernaut",
+            "name": "Ultra-Juggernaut",
+            "cost": 15000,
+            "damage_delta": 3,
+            "pierce_delta": 146,
+            "blast_radius_delta": 1.5
+          }
+        ],
+        "middle_path": [
+          {
+            "tier": 1,
+            "id": "quick_shots",
+            "name": "Quick Shots",
+            "cost": 100,
+            "cooldown_multiplier": 0.85
+          },
+          {
+            "tier": 2,
+            "id": "very_quick_shots",
+            "name": "Very Quick Shots",
+            "cost": 190,
+            "cooldown_multiplier": 0.8
+          },
+          {
+            "tier": 3,
+            "id": "triple_shot",
+            "name": "Triple Shot",
+            "cost": 400,
+            "cooldown_multiplier": 0.65
+          },
+          {
+            "tier": 4,
+            "id": "super_monkey_fan_club",
+            "name": "Super Monkey Fan Club",
+            "cost": 8000,
+            "cooldown_multiplier": 0.5
+          },
+          {
+            "tier": 5,
+            "id": "plasma_monkey_fan_club",
+            "name": "Plasma Monkey Fan Club",
+            "cost": 45000,
+            "cooldown_multiplier": 0.5
+          }
+        ],
+        "bottom_path": [
+          {
+            "tier": 1,
+            "id": "long_range_darts",
+            "name": "Long Range Darts",
+            "cost": 90,
+            "range_delta": 1.0
+          },
+          {
+            "tier": 2,
+            "id": "enhanced_eyesight",
+            "name": "Enhanced Eyesight",
+            "cost": 200,
+            "range_delta": 1.0,
+            "cooldown_multiplier": 0.9,
+            "grants_camo": true
+          },
+          {
+            "tier": 3,
+            "id": "crossbow",
+            "name": "Crossbow",
+            "cost": 575,
+            "damage_delta": 2,
+            "pierce_delta": 1,
+            "range_delta": 1.5
+          },
+          {
+            "tier": 4,
+            "id": "sharp_shooter",
+            "name": "Sharp Shooter",
+            "cost": 2000,
+            "damage_delta": 3,
+            "pierce_delta": 2,
+            "cooldown_multiplier": 0.75
+          },
+          {
+            "tier": 5,
+            "id": "crossbow_master",
+            "name": "Crossbow Master",
+            "cost": 21500,
+            "damage_delta": 11,
+            "pierce_delta": 8,
+            "range_delta": 1.0,
+            "cooldown_multiplier": 0.3
+          }
+        ]
+      }
+    },
+    "boomerang_monkey": {
+      "id": "boomerang_monkey",
+      "category": "primary",
+      "role": "attacker",
+      "base_cost": 325,
+      "range_grid": 5.0,
+      "base_damage": 1,
+      "base_pierce": 4,
+      "cooldown_seconds": 1.2,
+      "blast_radius": 0.0,
+      "can_see_camo": false,
+      "damage_type": "sharp",
+      "footprint_radius": 0.6,
+      "upgrades": {
+        "top_path": [
+          {
+            "tier": 1,
+            "id": "improved_rangs",
+            "name": "Improved Rangs",
+            "cost": 200,
+            "pierce_delta": 4
+          },
+          {
+            "tier": 2,
+            "id": "glaives",
+            "name": "Glaives",
+            "cost": 280,
+            "damage_delta": 1,
+            "pierce_delta": 2
+          },
+          {
+            "tier": 3,
+            "id": "glaive_ricochet",
+            "name": "Glaive Ricochet",
+            "cost": 1300,
+            "pierce_delta": 40
+          },
+          {
+            "tier": 4,
+            "id": "moar_glaives",
+            "name": "MOAR Glaives",
+            "cost": 3000,
+            "pierce_delta": 50,
+            "cooldown_multiplier": 0.8
+          },
+          {
+            "tier": 5,
+            "id": "glaive_lord",
+            "name": "Glaive Lord",
+            "cost": 32400,
+            "damage_delta": 7,
+            "pierce_delta": 100
+          }
+        ],
+        "middle_path": [
+          {
+            "tier": 1,
+            "id": "faster_throwing",
+            "name": "Faster Throwing",
+            "cost": 175,
+            "cooldown_multiplier": 0.75
+          },
+          {
+            "tier": 2,
+            "id": "bionic_boomerang",
+            "name": "Bionic Boomerang",
+            "cost": 250,
+            "cooldown_multiplier": 0.75
+          },
+          {
+            "tier": 3,
+            "id": "bionic_boomerang_3",
+            "name": "Bionic Boomerang",
+            "cost": 1450,
+            "damage_delta": 1,
+            "cooldown_multiplier": 0.5
+          },
+          {
+            "tier": 4,
+            "id": "turbo_charge",
+            "name": "Turbo Charge",
+            "cost": 4200,
+            "cooldown_multiplier": 0.3
+          },
+          {
+            "tier": 5,
+            "id": "perma_charge",
+            "name": "Perma Charge",
+            "cost": 35000,
+            "damage_delta": 3,
+            "cooldown_multiplier": 0.2
+          }
+        ],
+        "bottom_path": [
+          {
+            "tier": 1,
+            "id": "long_range_rangs",
+            "name": "Long Range Rangs",
+            "cost": 100,
+            "range_delta": 1.0
+          },
+          {
+            "tier": 2,
+            "id": "red_hot_rangs",
+            "name": "Red Hot Rangs",
+            "cost": 300,
+            "damage_delta": 1
+          },
+          {
+            "tier": 3,
+            "id": "kylie_boomerang",
+            "name": "Kylie Boomerang",
+            "cost": 1300,
+            "damage_delta": 1,
+            "pierce_delta": 14
+          },
+          {
+            "tier": 4,
+            "id": "moab_press",
+            "name": "MOAB Press",
+            "cost": 2200,
+            "damage_delta": 2
+          },
+          {
+            "tier": 5,
+            "id": "moab_domination",
+            "name": "MOAB Domination",
+            "cost": 50000,
+            "damage_delta": 10
+          }
+        ]
+      }
+    },
+    "bomb_shooter": {
+      "id": "bomb_shooter",
+      "category": "primary",
+      "role": "attacker",
+      "base_cost": 525,
+      "range_grid": 5.0,
+      "base_damage": 1,
+      "base_pierce": 14,
+      "cooldown_seconds": 1.5,
+      "blast_radius": 2.2,
+      "can_see_camo": false,
+      "damage_type": "explosion",
+      "footprint_radius": 0.7,
+      "upgrades": {
+        "top_path": [
+          {
+            "tier": 1,
+            "id": "bigger_bombs",
+            "name": "Bigger Bombs",
+            "cost": 350,
+            "pierce_delta": 6,
+            "blast_radius_delta": 0.6
+          },
+          {
+            "tier": 2,
+            "id": "heavy_bombs",
+            "name": "Heavy Bombs",
+            "cost": 650,
+            "damage_delta": 1,
+            "pierce_delta": 10
+          },
+          {
+            "tier": 3,
+            "id": "really_big_bombs",
+            "name": "Really Big Bombs",
+            "cost": 1200,
+            "damage_delta": 1,
+            "pierce_delta": 20,
+            "blast_radius_delta": 1.0
+          },
+          {
+            "tier": 4,
+            "id": "bloon_impact",
+            "name": "Bloon Impact",
+            "cost": 3600,
+            "damage_delta": 1,
+            "pierce_delta": 10
+          },
+          {
+            "tier": 5,
+            "id": "bloon_crush",
+            "name": "Bloon Crush",
+            "cost": 55000,
+            "damage_delta": 9,
+            "blast_radius_delta": 1.5
+          }
+        ],
+        "middle_path": [
+          {
+            "tier": 1,
+            "id": "faster_reload",
+            "name": "Faster Reload",
+            "cost": 250,
+            "cooldown_multiplier": 0.75
+          },
+          {
+            "tier": 2,
+            "id": "missile_launcher",
+            "name": "Missile Launcher",
+            "cost": 400,
+            "range_delta": 1.5,
+            "cooldown_multiplier": 0.8
+          },
+          {
+            "tier": 3,
+            "id": "moab_mauler",
+            "name": "MOAB Mauler",
+            "cost": 900,
+            "damage_delta": 2
+          },
+          {
+            "tier": 4,
+            "id": "moab_assassin",
+            "name": "MOAB Assassin",
+            "cost": 3200,
+            "damage_delta": 3
+          },
+          {
+            "tier": 5,
+            "id": "moab_eliminator",
+            "name": "MOAB Eliminator",
+            "cost": 25000,
+            "damage_delta": 75,
+            "cooldown_multiplier": 0.5
+          }
+        ],
+        "bottom_path": [
+          {
+            "tier": 1,
+            "id": "extra_range",
+            "name": "Extra Range",
+            "cost": 200,
+            "range_delta": 1.0
+          },
+          {
+            "tier": 2,
+            "id": "frag_bombs",
+            "name": "Frag Bombs",
+            "cost": 300,
+            "pierce_delta": 8
+          },
+          {
+            "tier": 3,
+            "id": "cluster_bombs",
+            "name": "Cluster Bombs",
+            "cost": 800,
+            "damage_delta": 1,
+            "pierce_delta": 10,
+            "blast_radius_delta": 1.0
+          },
+          {
+            "tier": 4,
+            "id": "recursive_cluster",
+            "name": "Recursive Cluster",
+            "cost": 2800,
+            "damage_delta": 1,
+            "pierce_delta": 20
+          },
+          {
+            "tier": 5,
+            "id": "bomb_blitz",
+            "name": "Bomb Blitz",
+            "cost": 35000,
+            "damage_delta": 4,
+            "pierce_delta": 40
+          }
+        ]
+      }
+    },
+    "tack_shooter": {
+      "id": "tack_shooter",
+      "category": "primary",
+      "role": "attacker",
+      "base_cost": 280,
+      "range_grid": 2.8,
+      "base_damage": 1,
+      "base_pierce": 5,
+      "cooldown_seconds": 1.4,
+      "blast_radius": 0.0,
+      "can_see_camo": false,
+      "damage_type": "sharp",
+      "footprint_radius": 0.6,
+      "upgrades": {
+        "top_path": [
+          {
+            "tier": 1,
+            "id": "faster_shooting",
+            "name": "Faster Shooting",
+            "cost": 150,
+            "cooldown_multiplier": 0.75
+          },
+          {
+            "tier": 2,
+            "id": "even_faster_shooting",
+            "name": "Even Faster Shooting",
+            "cost": 225,
+            "cooldown_multiplier": 0.75
+          },
+          {
+            "tier": 3,
+            "id": "hot_shots",
+            "name": "Hot Shots",
+            "cost": 600,
+            "damage_delta": 1
+          },
+          {
+            "tier": 4,
+            "id": "ring_of_fire",
+            "name": "Ring of Fire",
+            "cost": 3500,
+            "damage_delta": 3,
+            "pierce_delta": 35
+          },
+          {
+            "tier": 5,
+            "id": "inferno_ring",
+            "name": "Inferno Ring",
+            "cost": 45500,
+            "damage_delta": 15,
+            "pierce_delta": 25
+          }
+        ],
+        "middle_path": [
+          {
+            "tier": 1,
+            "id": "long_range_tacks",
+            "name": "Long Range Tacks",
+            "cost": 100,
+            "range_delta": 0.5
+          },
+          {
+            "tier": 2,
+            "id": "super_range_tacks",
+            "name": "Super Range Tacks",
+            "cost": 225,
+            "range_delta": 0.5,
+            "pierce_delta": 2
+          },
+          {
+            "tier": 3,
+            "id": "blade_shooter",
+            "name": "Blade Shooter",
+            "cost": 400,
+            "damage_delta": 1
+          },
+          {
+            "tier": 4,
+            "id": "blade_maelstrom",
+            "name": "Blade Maelstrom",
+            "cost": 2700,
+            "pierce_delta": 200
+          },
+          {
+            "tier": 5,
+            "id": "super_maelstrom",
+            "name": "Super Maelstrom",
+            "cost": 15000,
+            "damage_delta": 2
+          }
+        ],
+        "bottom_path": [
+          {
+            "tier": 1,
+            "id": "more_tacks",
+            "name": "More Tacks",
+            "cost": 100,
+            "pierce_delta": 2
+          },
+          {
+            "tier": 2,
+            "id": "even_more_tacks",
+            "name": "Even More Tacks",
+            "cost": 100,
+            "pierce_delta": 3
+          },
+          {
+            "tier": 3,
+            "id": "tack_sprayer",
+            "name": "Tack Sprayer",
+            "cost": 400,
+            "damage_delta": 1
+          },
+          {
+            "tier": 4,
+            "id": "overdrive",
+            "name": "Overdrive",
+            "cost": 3200,
+            "cooldown_multiplier": 0.3
+          },
+          {
+            "tier": 5,
+            "id": "the_tack_zone",
+            "name": "The Tack Zone",
+            "cost": 20000,
+            "damage_delta": 1,
+            "cooldown_multiplier": 0.6
+          }
+        ]
+      }
+    },
+    "ninja_monkey": {
+      "id": "ninja_monkey",
+      "category": "magic",
+      "role": "attacker",
+      "base_cost": 500,
+      "range_grid": 5.0,
+      "base_damage": 1,
+      "base_pierce": 2,
+      "cooldown_seconds": 0.78,
+      "blast_radius": 0.0,
+      "can_see_camo": true,
+      "damage_type": "sharp",
+      "footprint_radius": 0.6,
+      "upgrades": {
+        "top_path": [
+          {
+            "tier": 1,
+            "id": "ninja_discipline",
+            "name": "Ninja Discipline",
+            "cost": 300,
+            "range_delta": 1.0,
+            "cooldown_multiplier": 0.7
+          },
+          {
+            "tier": 2,
+            "id": "sharp_shurikens",
+            "name": "Sharp Shurikens",
+            "cost": 350,
+            "pierce_delta": 2
+          },
+          {
+            "tier": 3,
+            "id": "double_shot",
+            "name": "Double Shot",
+            "cost": 850,
+            "damage_delta": 1
+          },
+          {
+            "tier": 4,
+            "id": "bloonjitsu",
+            "name": "Bloonjitsu",
+            "cost": 2750,
+            "damage_delta": 3
+          },
+          {
+            "tier": 5,
+            "id": "grandmaster_ninja",
+            "name": "Grandmaster Ninja",
+            "cost": 35000,
+            "damage_delta": 6,
+            "cooldown_multiplier": 0.25
+          }
+        ],
+        "middle_path": [
+          {
+            "tier": 1,
+            "id": "distraction",
+            "name": "Distraction",
+            "cost": 300,
+            "pierce_delta": 1
+          },
+          {
+            "tier": 2,
+            "id": "counter_espionage",
+            "name": "Counter-Espionage",
+            "cost": 350,
+            "damage_delta": 1
+          },
+          {
+            "tier": 3,
+            "id": "shinobi_tactics",
+            "name": "Shinobi Tactics",
+            "cost": 900,
+            "cooldown_multiplier": 0.9
+          },
+          {
+            "tier": 4,
+            "id": "bloon_sabotage",
+            "name": "Bloon Sabotage",
+            "cost": 5000,
+            "cooldown_multiplier": 0.9
+          },
+          {
+            "tier": 5,
+            "id": "grand_saboteur",
+            "name": "Grand Saboteur",
+            "cost": 22000,
+            "damage_delta": 10
+          }
+        ],
+        "bottom_path": [
+          {
+            "tier": 1,
+            "id": "seeking_shuriken",
+            "name": "Seeking Shuriken",
+            "cost": 250,
+            "range_delta": 1.0
+          },
+          {
+            "tier": 2,
+            "id": "caltrops",
+            "name": "Caltrops",
+            "cost": 400,
+            "pierce_delta": 3
+          },
+          {
+            "tier": 3,
+            "id": "flash_bomb",
+            "name": "Flash Bomb",
+            "cost": 1000,
+            "damage_delta": 2,
+            "blast_radius_delta": 1.0
+          },
+          {
+            "tier": 4,
+            "id": "sticky_bomb",
+            "name": "Sticky Bomb",
+            "cost": 4500,
+            "damage_delta": 400
+          },
+          {
+            "tier": 5,
+            "id": "master_bomber",
+            "name": "Master Bomber",
+            "cost": 40000,
+            "damage_delta": 1000
+          }
+        ]
+      }
+    },
+    "alchemist": {
+      "id": "alchemist",
+      "category": "magic",
+      "role": "alchemist_buffer",
+      "base_cost": 550,
+      "range_grid": 5.5,
+      "base_damage": 1,
+      "base_pierce": 15,
+      "cooldown_seconds": 2.0,
+      "blast_radius": 1.8,
+      "can_see_camo": false,
+      "damage_type": "energy",
+      "footprint_radius": 0.6,
+      "upgrades": {
+        "top_path": [
+          {
+            "tier": 1,
+            "id": "larger_potions",
+            "name": "Larger Potions",
+            "cost": 250,
+            "pierce_delta": 5,
+            "blast_radius_delta": 0.5
+          },
+          {
+            "tier": 2,
+            "id": "acidic_mixture_dip",
+            "name": "Acidic Mixture Dip",
+            "cost": 350,
+            "buff_duration": 10.0,
+            "buff_shots": 10,
+            "buff_damage_bonus": 1,
+            "buff_pierce_bonus": 3,
+            "buff_cooldown_mult": 0.9,
+            "buff_grants_lead_pop": true
+          },
+          {
+            "tier": 3,
+            "id": "berserker_brew",
+            "name": "Berserker Brew",
+            "cost": 1250,
+            "buff_duration": 12.0,
+            "buff_shots": 40,
+            "buff_damage_bonus": 2,
+            "buff_pierce_bonus": 4,
+            "buff_cooldown_mult": 0.8
+          },
+          {
+            "tier": 4,
+            "id": "stronger_stimulant",
+            "name": "Stronger Stimulant",
+            "cost": 3000,
+            "buff_duration": 15.0,
+            "buff_shots": 50,
+            "buff_damage_bonus": 3,
+            "buff_pierce_bonus": 6,
+            "buff_cooldown_mult": 0.75
+          },
+          {
+            "tier": 5,
+            "id": "permanent_brew",
+            "name": "Permanent Brew",
+            "cost": 60000,
+            "buff_duration": 9999.0,
+            "buff_shots": 99999,
+            "buff_damage_bonus": 3,
+            "buff_pierce_bonus": 6,
+            "buff_cooldown_mult": 0.75
+          }
+        ],
+        "middle_path": [
+          {
+            "tier": 1,
+            "id": "stronger_acid",
+            "name": "Stronger Acid",
+            "cost": 250,
+            "damage_delta": 1
+          },
+          {
+            "tier": 2,
+            "id": "perishing_potions",
+            "name": "Perishing Potions",
+            "cost": 450,
+            "damage_delta": 1,
+            "pierce_delta": 5
+          },
+          {
+            "tier": 3,
+            "id": "unstable_concoction",
+            "name": "Unstable Concoction",
+            "cost": 3000,
+            "damage_delta": 5
+          },
+          {
+            "tier": 4,
+            "id": "transforming_tonic",
+            "name": "Transforming Tonic",
+            "cost": 4500,
+            "damage_delta": 10,
+            "cooldown_multiplier": 0.5
+          },
+          {
+            "tier": 5,
+            "id": "total_transformation",
+            "name": "Total Transformation",
+            "cost": 30000,
+            "damage_delta": 30,
+            "cooldown_multiplier": 0.2
+          }
+        ],
+        "bottom_path": [
+          {
+            "tier": 1,
+            "id": "faster_throwing",
+            "name": "Faster Throwing",
+            "cost": 250,
+            "cooldown_multiplier": 0.7
+          },
+          {
+            "tier": 2,
+            "id": "acid_pool",
+            "name": "Acid Pool",
+            "cost": 400,
+            "pierce_delta": 10
+          },
+          {
+            "tier": 3,
+            "id": "lead_to_gold",
+            "name": "Lead to Gold",
+            "cost": 1000,
+            "damage_delta": 2
+          },
+          {
+            "tier": 4,
+            "id": "rubber_to_gold",
+            "name": "Rubber to Gold",
+            "cost": 2750,
+            "range_delta": 1.0
+          },
+          {
+            "tier": 5,
+            "id": "bloon_master_alchemist",
+            "name": "Bloon Master Alchemist",
+            "cost": 40000,
+            "damage_delta": 1000
+          }
+        ]
+      }
+    },
+    "monkey_village": {
+      "id": "monkey_village",
+      "category": "support",
+      "role": "village_aura",
+      "base_cost": 1200,
+      "range_grid": 5.5,
+      "base_damage": 0,
+      "base_pierce": 1,
+      "cooldown_seconds": 999.0,
+      "blast_radius": 0.0,
+      "can_see_camo": false,
+      "damage_type": "none",
+      "footprint_radius": 1.1,
+      "aura_range_mult": 1.1,
+      "aura_cooldown_mult": 1.0,
+      "aura_grants_camo": false,
+      "upgrades": {
+        "top_path": [
+          {
+            "tier": 1,
+            "id": "bigger_radius",
+            "name": "Bigger Radius",
+            "cost": 400,
+            "range_delta": 1.0,
+            "aura_range_mult_delta": 0.1
+          },
+          {
+            "tier": 2,
+            "id": "jungle_drums",
+            "name": "Jungle Drums",
+            "cost": 1500,
+            "aura_cooldown_mult_delta": -0.15
+          },
+          {
+            "tier": 3,
+            "id": "primary_training",
+            "name": "Primary Training",
+            "cost": 1000,
+            "aura_range_mult_delta": 0.1
+          },
+          {
+            "tier": 4,
+            "id": "primary_mentoring",
+            "name": "Primary Mentoring",
+            "cost": 2500,
+            "aura_range_mult_delta": 0.1
+          },
+          {
+            "tier": 5,
+            "id": "primary_expertise",
+            "name": "Primary Expertise",
+            "cost": 25000,
+            "damage_delta": 20,
+            "pierce_delta": 100
+          }
+        ],
+        "middle_path": [
+          {
+            "tier": 1,
+            "id": "grow_blocker",
+            "name": "Grow Blocker",
+            "cost": 250
+          },
+          {
+            "tier": 2,
+            "id": "radar_scanner",
+            "name": "Radar Scanner",
+            "cost": 2000,
+            "aura_grants_camo": true
+          },
+          {
+            "tier": 3,
+            "id": "mib",
+            "name": "Monkey Intelligence Bureau",
+            "cost": 7500
+          },
+          {
+            "tier": 4,
+            "id": "call_to_arms",
+            "name": "Call to Arms",
+            "cost": 20000,
+            "aura_cooldown_mult_delta": -0.2
+          },
+          {
+            "tier": 5,
+            "id": "homeland_defense",
+            "name": "Homeland Defense",
+            "cost": 40000,
+            "aura_cooldown_mult_delta": -0.3
+          }
+        ],
+        "bottom_path": [
+          {
+            "tier": 1,
+            "id": "monkey_business",
+            "name": "Monkey Business",
+            "cost": 300
+          },
+          {
+            "tier": 2,
+            "id": "monkey_commerce",
+            "name": "Monkey Commerce",
+            "cost": 300
+          },
+          {
+            "tier": 3,
+            "id": "monkey_town",
+            "name": "Monkey Town",
+            "cost": 10000
+          },
+          {
+            "tier": 4,
+            "id": "monkey_city",
+            "name": "Monkey City",
+            "cost": 3000
+          },
+          {
+            "tier": 5,
+            "id": "monkey_opolis",
+            "name": "Monkeyopolis",
+            "cost": 5000
+          }
+        ]
+      }
+    },
+    "banana_farm": {
+      "id": "banana_farm",
+      "category": "support",
+      "role": "economy",
+      "base_cost": 1000,
+      "range_grid": 1.0,
+      "base_damage": 0,
+      "base_pierce": 0,
+      "cooldown_seconds": 5.0,
+      "blast_radius": 0.0,
+      "can_see_camo": false,
+      "damage_type": "none",
+      "footprint_radius": 1.0,
+      "upgrades": {
+        "top_path": [
+          {
+            "tier": 1,
+            "id": "increased_production",
+            "name": "Increased Production",
+            "cost": 500
+          },
+          {
+            "tier": 2,
+            "id": "greater_production",
+            "name": "Greater Production",
+            "cost": 600
+          },
+          {
+            "tier": 3,
+            "id": "banana_plantation",
+            "name": "Banana Plantation",
+            "cost": 3000
+          },
+          {
+            "tier": 4,
+            "id": "banana_research_facility",
+            "name": "Banana Research Facility",
+            "cost": 19000
+          },
+          {
+            "tier": 5,
+            "id": "banana_central",
+            "name": "Banana Central",
+            "cost": 100000
+          }
+        ],
+        "middle_path": [
+          {
+            "tier": 1,
+            "id": "long_life_bananas",
+            "name": "Long Life Bananas",
+            "cost": 300
+          },
+          {
+            "tier": 2,
+            "id": "valuable_bananas",
+            "name": "Valuable Bananas",
+            "cost": 800
+          },
+          {
+            "tier": 3,
+            "id": "monkey_bank",
+            "name": "Monkey Bank",
+            "cost": 3300
+          },
+          {
+            "tier": 4,
+            "id": "imf_loan",
+            "name": "IMF Loan",
+            "cost": 7500
+          },
+          {
+            "tier": 5,
+            "id": "monkey_nomics",
+            "name": "Monkey-Nomics",
+            "cost": 90000
+          }
+        ],
+        "bottom_path": [
+          {
+            "tier": 1,
+            "id": "ez_collect",
+            "name": "EZ Collect",
+            "cost": 250
+          },
+          {
+            "tier": 2,
+            "id": "banana_salvage",
+            "name": "Banana Salvage",
+            "cost": 200
+          },
+          {
+            "tier": 3,
+            "id": "marketplace",
+            "name": "Marketplace",
+            "cost": 2900
+          },
+          {
+            "tier": 4,
+            "id": "central_market",
+            "name": "Central Market",
+            "cost": 15000
+          },
+          {
+            "tier": 5,
+            "id": "wall_street",
+            "name": "Monkey Wall Street",
+            "cost": 60000
+          }
+        ]
+      }
+    }
+  }
+}
