@@ -50,7 +50,4 @@ Desktop.ini
 # LOGS & RELATÓRIOS
 # ==========================================
 logs/
-memory/btd6_meta_chimps.json
-memory/btd6_meta_easy.json
-memory/btd6_meta_medium.json
-memory/btd6_meta_hard.json
+memory/*
