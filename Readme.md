@@ -69,7 +69,3 @@ python main.py
 ```
 
 O script inicializa as arenas táticas (`BTD6TacticalEnv`), carrega ou cria a população no `AdaptiveGeneticOptimizer`, executa os macro-ticks compilados via Numba (`step_macro_ticks_jit`) e salva automaticamente os melhores genomas em `memory/best_genome.json`.
-
-## Limpeza Recomendada (Remoção de Código Morto da v1)
-
-Para manter o repositório enxuto e alinhado exclusivamente com a arquitetura v2.1, execute os comandos abaixo na raiz do projeto para remover os módulos legados da v1 e artefatos binários antigos:
