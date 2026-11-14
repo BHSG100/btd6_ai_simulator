@@ -25,9 +25,9 @@ memory/*.npz
 memory/*.tmp
 
 # Ignora os replays de checkpoints e modelos PPO compactados (.zip)
-checkpoints/*.json
-checkpoints/*.zip
-checkpoints/*.tmp
+checkpoints/*
+checkpoints/*
+checkpoints/*
 
 # ==========================================
 # IDEs, EDITORES & SISTEMA OPERACIONAL
@@ -45,3 +45,12 @@ Desktop.ini
 .DS_Store
 .DS_Store?
 ._* 
+
+# ==========================================
+# LOGS & RELATÓRIOS
+# ==========================================
+logs/
+memory/btd6_meta_chimps.json
+memory/btd6_meta_easy.json
+memory/btd6_meta_medium.json
+memory/btd6_meta_hard.json
