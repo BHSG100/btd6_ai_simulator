@@ -73,11 +73,3 @@ O script inicializa as arenas táticas (`BTD6TacticalEnv`), carrega ou cria a po
 ## Limpeza Recomendada (Remoção de Código Morto da v1)
 
 Para manter o repositório enxuto e alinhado exclusivamente com a arquitetura v2.1, execute os comandos abaixo na raiz do projeto para remover os módulos legados da v1 e artefatos binários antigos:
-
-```powershell
-git rm benchmark.py btd6_control_center.py visual_watcher.py
-git rm core/arenas.py core/grid.py core/jit_kernels.py core/path.py
-git rm ai/evaluate_agent.py ai/ga_evaluator.py ai/gym_env.py ai/train_ga.py ai/train_ppo.py ai/train_ppo_gpu.py
-git rm -r checkpoints/
-git rm memory/btd6_meta_chimps.json memory/btd6_meta_easy.json memory/btd6_meta_hard.json memory/btd6_meta_medium.json
-```
