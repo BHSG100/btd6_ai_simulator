@@ -1,389 +1,301 @@
-from __future__ import annotations
-
-from dataclasses import dataclass
-from typing import Dict, List
 import numpy as np
-import numpy.typing as npt
+from numba import njit
 
-from core.arenas import BloonPool, TargetingMode, TowerManager
-from core.grid import CellState, GridMap
-from core.jit_kernels import (
-    jit_run_round_loop,
-    jit_spawn_step,
-    jit_step_combat_v2,
-    jit_step_movement,
-)
-from core.path import WaypointPath
-from utils.data_loader import BloonLookupTable, CompiledRound, TowerData
+# Bitmasks de Tipos de Dano e Imunidades
+DMG_SHARP = 1 << 0
+DMG_EXPLOSION = 1 << 1
+DMG_ENERGY = 1 << 2
+DMG_FREEZE = 1 << 3
+DMG_NORMAL = 1 << 4  # Ignora imunidades (MIB / Acidic Mixture Dip / Tier 5)
 
-
-@dataclass(frozen=True)
-class StepResult:
-    """Métricas de retorno imediato para cálculo de recompensa (Reward Shaping)."""
-    cash_earned: int
-    pops: int
-    lives_lost: int
-    round_cleared: bool
-    is_game_over: bool
-    is_victory: bool
+# Modos de Alvo
+TARGET_FIRST = 0
+TARGET_LAST = 1
+TARGET_CLOSE = 2
+TARGET_STRONG = 3
 
 
-class GameEngine:
-    """
-    Fachada principal da simulação BTD6 para treinamento massivo em IA.
-    Suporta compra, upgrades dinâmicos com trava 5-2-0, venda de torres
-    e execução compilada LLVM via Numba (@njit).
-    """
+@njit(fastmath=True, nogil=True, cache=True)
+def step_macro_ticks_jit(
+    n_ticks,
+    dt,
+    # Waypoints da trilha: shape (N_WP, 2) e distâncias acumuladas (N_WP,)
+    wp_coords,
+    wp_cum_dist,
+    total_track_len,
+    # Estado dos Bloons (SoA) - Capacidade fixa MAX_BLOONS
+    b_active,
+    b_hp,
+    b_max_hp,
+    b_speed,
+    b_dist,
+    b_x,
+    b_y,
+    b_camo,
+    b_immun,
+    b_rbe,
+    b_children_count,
+    b_child_hp,
+    b_child_speed,
+    b_child_immun,
+    b_is_moab,
+    # Fila de Spawn da Ronda
+    spawn_tick,
+    spawn_hp,
+    spawn_speed,
+    spawn_camo,
+    spawn_immun,
+    spawn_rbe,
+    spawn_children,
+    spawn_child_hp,
+    spawn_child_speed,
+    spawn_child_immun,
+    spawn_is_moab,
+    spawn_cursor_arr,  # array shape (1,) para mutação in-place
+    # Estado das Torres (SoA) - Capacidade fixa MAX_TOWERS
+    t_active,
+    t_x,
+    t_y,
+    t_range,
+    t_damage,
+    t_moab_bonus,
+    t_pierce,
+    t_cooldown,
+    t_timer,
+    t_camo_See,
+    t_dmg_type,
+    t_splash_radius,
+    t_target_mode,
+    t_is_alch,
+    t_is_village,
+    t_income_per_round,
+    t_pops,
+    # Buffers visuais de feixes para o Pygame: shape (MAX_LASERS, 5) -> [x1, y1, x2, y2, dmg_type]
+    laser_buf,
+    laser_count_arr,
+    # Estado Global da Partida: [cash, lives, current_tick, total_rbe_popped]
+    game_state,
+):
+    max_bloons = b_active.shape[0]
+    max_towers = t_active.shape[0]
+    n_spawns = spawn_tick.shape[0]
+    n_wp = wp_coords.shape[0]
+    max_lasers = laser_buf.shape[0]
 
-    def __init__(
-        self,
-        grid_width: int,
-        grid_height: int,
-        waypoints: npt.NDArray[np.float32],
-        path_cells: npt.NDArray[np.int32],
-        towers_catalog: Dict[str, TowerData],
-        bloon_lookup: BloonLookupTable,
-        rounds_schedule: List[CompiledRound],
-        starting_cash: int = 650,
-        starting_lives: int = 100,
-        max_bloons: int = 4096,
-        max_towers: int = 64,
-        sell_refund_rate: float = 0.70,
-    ) -> None:
-        self.grid_width = grid_width
-        self.grid_height = grid_height
-        self.waypoints = waypoints
-        self.path_cells = path_cells
-        self.towers_catalog = towers_catalog
-        self.bloon_lookup = bloon_lookup
-        self.rounds_schedule = rounds_schedule
+    # 1. Pré-cálculo de Auras e Buffs (Village + Alchemist)
+    eff_range = np.copy(t_range)
+    eff_damage = np.copy(t_damage)
+    eff_cooldown = np.copy(t_cooldown)
+    eff_camo = np.copy(t_camo_See)
+    eff_dmg_type = np.copy(t_dmg_type)
 
-        self.starting_cash = starting_cash
-        self.starting_lives = starting_lives
-        self.max_bloons = max_bloons
-        self.max_towers = max_towers
-        self.sell_refund_rate = sell_refund_rate
+    for i in range(max_towers):
+        if t_active[i] == 0:
+            continue
+        if t_is_village[i] == 1:
+            vr2 = t_range[i] * t_range[i]
+            for j in range(max_towers):
+                if i != j and t_active[j] == 1:
+                    dx = t_x[i] - t_x[j]
+                    dy = t_y[i] - t_y[j]
+                    if dx * dx + dy * dy <= vr2:
+                        eff_range[j] = t_range[j] * 1.15
+                        eff_cooldown[j] = t_cooldown[j] * 0.85
+                        eff_camo[j] = 1
+                        if t_damage[i] > 0:  # MIB ativo
+                            eff_dmg_type[j] = DMG_NORMAL
+        elif t_is_alch[i] == 1:
+            ar2 = t_range[i] * t_range[i]
+            for j in range(max_towers):
+                if i != j and t_active[j] == 1 and t_is_village[j] == 0:
+                    dx = t_x[i] - t_x[j]
+                    dy = t_y[i] - t_y[j]
+                    if dx * dx + dy * dy <= ar2:
+                        eff_damage[j] += 1.0
+                        eff_range[j] *= 1.10
+                        eff_cooldown[j] *= 0.90
+                        eff_dmg_type[j] = DMG_NORMAL
 
-        self._scratch_cand = np.empty(max_bloons, dtype=np.int32)
-        self._scratch_hits = np.empty(max_bloons, dtype=np.int32)
-        self._scratch_queue = np.empty(max_bloons, dtype=np.int32)
+    # Loop principal de Ticks
+    for _ in range(n_ticks):
+        if game_state[1] <= 0.0:
+            break
 
-        self.grid: GridMap
-        self.path: WaypointPath
-        self.bloons: BloonPool
-        self.towers: TowerManager
+        cur_tick = int(game_state[2])
+        game_state[2] += 1.0
 
-        self.cash: int = starting_cash
-        self.lives: int = starting_lives
-        self.current_round_idx: int = 0
-        self.total_pops: int = 0
-        self.ticks_elapsed: int = 0
-        self.round_active: bool = False
-        self.round_elapsed_time: float = 0.0
-        self.round_spawn_cursor: int = 0
-        self.is_game_over: bool = False
-        self.is_victory: bool = False
+        # 2. Spawn de Bloons da Fila
+        cursor = spawn_cursor_arr[0]
+        while cursor < n_spawns and spawn_tick[cursor] <= cur_tick:
+            # Busca slot livre no SoA
+            for b in range(max_bloons):
+                if b_active[b] == 0:
+                    b_active[b] = 1
+                    b_hp[b] = spawn_hp[cursor]
+                    b_max_hp[b] = spawn_hp[cursor]
+                    b_speed[b] = spawn_speed[cursor]
+                    b_dist[b] = 0.0
+                    b_x[b] = wp_coords[0, 0]
+                    b_y[b] = wp_coords[0, 1]
+                    b_camo[b] = spawn_camo[cursor]
+                    b_immun[b] = spawn_immun[cursor]
+                    b_rbe[b] = spawn_rbe[cursor]
+                    b_children_count[b] = spawn_children[cursor]
+                    b_child_hp[b] = spawn_child_hp[cursor]
+                    b_child_speed[b] = spawn_child_speed[cursor]
+                    b_child_immun[b] = spawn_child_immun[cursor]
+                    b_is_moab[b] = spawn_is_moab[cursor]
+                    break
+            cursor += 1
+        spawn_cursor_arr[0] = cursor
 
-        self.reset()
+        # 3. Movimento Vetorizado e Interpolação nos Waypoints
+        active_bloons_count = 0
+        for b in range(max_bloons):
+            if b_active[b] == 0:
+                continue
+            b_dist[b] += b_speed[b] * dt
+            if b_dist[b] >= total_track_len:
+                # Vazamento (Leak)
+                game_state[1] -= b_rbe[b]
+                b_active[b] = 0
+                continue
 
-    def reset(self) -> npt.NDArray[np.float32]:
-        """Reinicia o estado da engine para um novo episódio de treinamento."""
-        self.grid = GridMap(self.grid_width, self.grid_height)
-        self.grid.set_path_cells(self.path_cells)
+            active_bloons_count += 1
+            # Interpolação linear rápida na trilha
+            dist = b_dist[b]
+            for w in range(n_wp - 1):
+                if dist >= wp_cum_dist[w] and dist <= wp_cum_dist[w + 1]:
+                    seg_len = wp_cum_dist[w + 1] - wp_cum_dist[w]
+                    t_ratio = (dist - wp_cum_dist[w]) / (seg_len + 1e-8)
+                    b_x[b] = wp_coords[w, 0] + t_ratio * (wp_coords[w + 1, 0] - wp_coords[w, 0])
+                    b_y[b] = wp_coords[w, 1] + t_ratio * (wp_coords[w + 1, 1] - wp_coords[w, 1])
+                    break
 
-        self.path = WaypointPath(self.waypoints)
-        self.bloons = BloonPool(self.max_bloons)
-        self.towers = TowerManager(self.max_towers, self.sell_refund_rate)
+        if active_bloons_count == 0 and spawn_cursor_arr[0] >= n_spawns:
+            break
 
-        self.cash = self.starting_cash
-        self.lives = self.starting_lives
-        self.current_round_idx = 0
-        self.total_pops = 0
-        self.ticks_elapsed = 0
-        self.round_active = False
-        self.round_elapsed_time = 0.0
-        self.round_spawn_cursor = 0
-        self.is_game_over = False
-        self.is_victory = False
+        # 4. Disparo das Torres com Seleção de Alvo, Imunidades e Cascata de Filhos
+        for t in range(max_towers):
+            if t_active[t] == 0 or t_is_village[t] == 1:
+                continue
 
-        return self.get_observation_vector()
+            if t_timer[t] > 0.0:
+                t_timer[t] -= dt
+                continue
 
-    # =========================================================================
-    # API DE AÇÕES DA IA (Posicionamento, Upgrades 5-2-0, Venda e Mira)
-    # =========================================================================
+            r2 = eff_range[t] * eff_range[t]
+            tx = t_x[t]
+            ty = t_y[t]
+            can_camo = eff_camo[t]
+            dtype = eff_dmg_type[t]
+            mode = t_target_mode[t]
 
-    def action_place_tower(
-        self,
-        tower_id: str,
-        x: int,
-        y: int,
-        top_tier: int = 0,
-        mid_tier: int = 0,
-        bot_tier: int = 0,
-        target_mode: TargetingMode = TargetingMode.FIRST,
-    ) -> int:
-        if self.is_game_over or tower_id not in self.towers_catalog:
-            return -1
+            best_b = -1
+            best_score = -1e18
 
-        t_data = self.towers_catalog[tower_id]
-        try:
-            stats = t_data.compute_full_stats(top_tier, mid_tier, bot_tier)
-        except ValueError:
-            return -1
+            for b in range(max_bloons):
+                if b_active[b] == 0:
+                    continue
+                if b_camo[b] == 1 and can_camo == 0:
+                    continue
+                if dtype != DMG_NORMAL and (b_immun[b] & dtype) != 0:
+                    continue
 
-        if self.cash < stats.total_cost:
-            return -1
+                dx = b_x[b] - tx
+                dy = b_y[b] - ty
+                d2 = dx * dx + dy * dy
+                if d2 <= r2:
+                    if mode == TARGET_FIRST:
+                        score = b_dist[b]
+                    elif mode == TARGET_LAST:
+                        score = -b_dist[b]
+                    elif mode == TARGET_CLOSE:
+                        score = -d2
+                    else:  # TARGET_STRONG
+                        score = b_hp[b] * 10000.0 + b_dist[b]
 
-        if not self.grid.place_tower_footprint(x, y):
-            return -1
+                    if score > best_score:
+                        best_score = score
+                        best_b = b
 
-        slot = self.towers.add_configured_tower(
-            tower_id=tower_id,
-            x=x,
-            y=y,
-            stats=stats,
-            tiers=(top_tier, mid_tier, bot_tier),
-            target_mode=target_mode,
-        )
-        if slot == -1:
-            self.grid.grid[x, y] = CellState.EMPTY
-            return -1
+            if best_b != -1:
+                t_timer[t] = eff_cooldown[t]
+                pierce_left = t_pierce[t]
+                splash_r2 = t_splash_radius[t] * t_splash_radius[t]
+                hit_x = b_x[best_b]
+                hit_y = b_y[best_b]
 
-        self.cash -= stats.total_cost
-        return slot
+                # Registra laser visual se houver espaço no buffer
+                l_idx = laser_count_arr[0]
+                if l_idx < max_lasers:
+                    laser_buf[l_idx, 0] = tx
+                    laser_buf[l_idx, 1] = ty
+                    laser_buf[l_idx, 2] = hit_x
+                    laser_buf[l_idx, 3] = hit_y
+                    laser_buf[l_idx, 4] = float(dtype)
+                    laser_count_arr[0] = l_idx + 1
 
-    def action_upgrade_tower(self, tower_slot: int, path_idx: int) -> bool:
-        """
-        Evolui o próximo tier do caminho `path_idx` (0=Top, 1=Mid, 2=Bot)
-        na torre do `tower_slot`, respeitando crosspathing 5-2-0 e caixa.
-        """
-        if self.is_game_over or not (0 <= tower_slot < self.max_towers):
-            return False
+                # Aplica dano ao alvo principal e vizinhos (se AoE ou Pierce > 1)
+                for b in range(max_bloons):
+                    if pierce_left <= 0:
+                        break
+                    if b_active[b] == 0:
+                        continue
+                    if b_camo[b] == 1 and can_camo == 0:
+                        continue
+                    if dtype != DMG_NORMAL and (b_immun[b] & dtype) != 0:
+                        continue
 
-        t_id = self.towers.tower_ids[tower_slot]
-        if t_id is None or not self.towers.arena.active[tower_slot]:
-            return False
+                    if b != best_b:
+                        if splash_r2 > 0.0:
+                            dx = b_x[b] - hit_x
+                            dy = b_y[b] - hit_y
+                            if dx * dx + dy * dy > splash_r2:
+                                continue
+                        else:
+                            dx = b_x[b] - tx
+                            dy = b_y[b] - ty
+                            if dx * dx + dy * dy > r2:
+                                continue
 
-        cost = self.towers.upgrade_tower(
-            slot=tower_slot,
-            path_idx=path_idx,
-            tower_data=self.towers_catalog[t_id],
-            available_cash=self.cash,
-        )
-        if cost < 0:
-            return False
+                    dmg = eff_damage[t]
+                    if b_is_moab[b] == 1:
+                        dmg += t_moab_bonus[t]
 
-        self.cash -= cost
-        return True
+                    dealt = min(b_hp[b], dmg)
+                    b_hp[b] -= dmg
+                    t_pops[t] += dealt
+                    game_state[0] += dealt  # Cash por pop
+                    game_state[3] += dealt  # Total RBE popped
+                    pierce_left -= 1
 
-    def action_sell_tower(self, tower_slot: int) -> int:
-        """
-        Vende a torre no `tower_slot`, reembolsa 70% do investimento total
-        e libera a célula correspondente no GridMap.
-        """
-        if self.is_game_over or not (0 <= tower_slot < self.max_towers):
-            return -1
+                    # Destruição e Spawn de Filhos in-place
+                    if b_hp[b] <= 0.0:
+                        children = b_children_count[b]
+                        parent_dist = b_dist[b]
+                        parent_camo = b_camo[b]
+                        c_hp = b_child_hp[b]
+                        c_spd = b_child_speed[b]
+                        c_imm = b_child_immun[b]
+                        b_active[b] = 0
 
-        refund, gx, gy = self.towers.sell_tower(tower_slot)
-        if refund < 0:
-            return -1
-
-        self.grid.clear_tower_footprint(gx, gy)
-        self.cash += refund
-        return refund
-
-    def action_change_targeting(
-        self, tower_slot: int, new_mode: TargetingMode
-    ) -> bool:
-        if 0 <= tower_slot < self.max_towers and self.towers.arena.active[tower_slot]:
-            self.towers.arena.target_mode[tower_slot] = int(new_mode)
-            return True
-        return False
-
-    # =========================================================================
-    # EXECUÇÃO DA SIMULAÇÃO
-    # =========================================================================
-
-    def start_next_round(self) -> bool:
-        if self.round_active or self.is_game_over or self.is_victory:
-            return False
-        if self.current_round_idx >= len(self.rounds_schedule):
-            self.is_victory = True
-            return False
-
-        self.round_elapsed_time = 0.0
-        self.round_spawn_cursor = 0
-        self.round_active = True
-        return True
-
-    def step_tick(self, dt: float = 0.05) -> StepResult:
-        if self.is_game_over or self.is_victory or not self.round_active:
-            return StepResult(0, 0, 0, False, self.is_game_over, self.is_victory)
-
-        c_round = self.rounds_schedule[self.current_round_idx]
-        self.ticks_elapsed += 1
-
-        lives_lost, _ = jit_step_movement(
-            float(dt),
-            self.bloons.arena,
-            self.bloon_lookup.speed,
-            self.bloon_lookup.rbe,
-            self.path.waypoints,
-            self.path.cumulative_distances,
-            self.path.unit_directions,
-            float(self.path.total_length),
-        )
-        if lives_lost > 0:
-            self.lives = max(0, self.lives - lives_lost)
-            if self.lives == 0:
-                self.is_game_over = True
-                self.round_active = False
-                return StepResult(0, 0, lives_lost, False, True, False)
-
-        self.round_elapsed_time += dt
-        if self.round_spawn_cursor < c_round.spawn_times.shape[0]:
-            self.round_spawn_cursor = jit_spawn_step(
-                float(self.round_elapsed_time),
-                int(self.round_spawn_cursor),
-                c_round.spawn_times,
-                c_round.bloon_numeric_ids,
-                c_round.spawn_camo,
-                self.bloons.arena,
-                self.bloon_lookup.base_hp,
-                self.bloon_lookup.speed,
-                self.path.waypoints,
-                self.path.cumulative_distances,
-                self.path.unit_directions,
-                float(self.path.total_length),
-            )
-
-        cash_earned, pops = jit_step_combat_v2(
-            float(dt),
-            self.towers.arena,
-            self.bloons.arena,
-            self.bloon_lookup.base_hp,
-            self.bloon_lookup.rbe,
-            self.bloon_lookup.cash_reward,
-            self.bloon_lookup.immunity_mask,
-            self.bloon_lookup.child_numeric_id,
-            self.bloon_lookup.child_count,
-            self.path.waypoints,
-            self.path.cumulative_distances,
-            self.path.unit_directions,
-            float(self.path.total_length),
-            self._scratch_cand,
-            self._scratch_hits,
-            self._scratch_queue,
-        )
-        self.cash += cash_earned
-        self.total_pops += pops
-
-        round_cleared = False
-        spawning_done = self.round_spawn_cursor >= c_round.spawn_times.shape[0]
-        if spawning_done and self.bloons.active_count == 0:
-            bonus = c_round.end_of_round_cash
-            self.cash += bonus
-            cash_earned += bonus
-
-            self.round_active = False
-            round_cleared = True
-            self.current_round_idx += 1
-
-            if self.current_round_idx >= len(self.rounds_schedule):
-                self.is_victory = True
-
-        return StepResult(
-            cash_earned=cash_earned,
-            pops=pops,
-            lives_lost=lives_lost,
-            round_cleared=round_cleared,
-            is_game_over=self.is_game_over,
-            is_victory=self.is_victory,
-        )
-
-    def run_round(self, dt: float = 0.05, max_ticks: int = 36000) -> StepResult:
-        if self.is_game_over or self.is_victory:
-            return StepResult(0, 0, 0, False, self.is_game_over, self.is_victory)
-        if self.current_round_idx >= len(self.rounds_schedule):
-            self.is_victory = True
-            return StepResult(0, 0, 0, False, False, True)
-
-        c_round = self.rounds_schedule[self.current_round_idx]
-
-        cash_earned, pops, lives_lost, ticks, cleared = jit_run_round_loop(
-            float(dt),
-            int(max_ticks),
-            int(self.lives),
-            c_round.spawn_times,
-            c_round.bloon_numeric_ids,
-            c_round.spawn_camo,
-            self.towers.arena,
-            self.bloons.arena,
-            self.bloon_lookup.base_hp,
-            self.bloon_lookup.speed,
-            self.bloon_lookup.rbe,
-            self.bloon_lookup.cash_reward,
-            self.bloon_lookup.immunity_mask,
-            self.bloon_lookup.child_numeric_id,
-            self.bloon_lookup.child_count,
-            self.path.waypoints,
-            self.path.cumulative_distances,
-            self.path.unit_directions,
-            float(self.path.total_length),
-            self._scratch_cand,
-            self._scratch_hits,
-            self._scratch_queue,
-        )
-
-        self.ticks_elapsed += ticks
-        self.cash += cash_earned
-        self.total_pops += pops
-        self.lives = max(0, self.lives - lives_lost)
-        self.round_active = False
-
-        if self.lives == 0:
-            self.is_game_over = True
-            return StepResult(cash_earned, pops, lives_lost, False, True, False)
-
-        if cleared:
-            bonus = c_round.end_of_round_cash
-            self.cash += bonus
-            cash_earned += bonus
-            self.current_round_idx += 1
-            if self.current_round_idx >= len(self.rounds_schedule):
-                self.is_victory = True
-
-        return StepResult(
-            cash_earned=cash_earned,
-            pops=pops,
-            lives_lost=lives_lost,
-            round_cleared=cleared,
-            is_game_over=self.is_game_over,
-            is_victory=self.is_victory,
-        )
-
-    def get_observation_vector(self) -> npt.NDArray[np.float32]:
-        """
-        Vetor de estado compacto (float32) para redes neurais:
-        - 5 escalares globais: [cash, lives, round_idx, active_bloons, active_towers]
-        - Grid 2D achatado: (W * H,)
-        - Estado de slots de torres: (max_towers * 4,) -> [active, top_t, mid_t, bot_t]
-        """
-        scalars = np.array(
-            [
-                float(self.cash),
-                float(self.lives),
-                float(self.current_round_idx),
-                float(self.bloons.active_count),
-                float(self.towers.count),
-            ],
-            dtype=np.float32,
-        )
-        flat_grid = self.grid.grid.ravel().astype(np.float32)
-        tower_slots_state = np.column_stack(
-            (
-                self.towers.arena.active.astype(np.float32),
-                self.towers.tiers.astype(np.float32),
-            )
-        ).ravel()
-        return np.concatenate((scalars, flat_grid, tower_slots_state))
+                        if children > 0 and c_hp > 0.0:
+                            spawned = 0
+                            for slot in range(max_bloons):
+                                if b_active[slot] == 0:
+                                    b_active[slot] = 1
+                                    b_hp[slot] = c_hp
+                                    b_max_hp[slot] = c_hp
+                                    b_speed[slot] = c_spd
+                                    b_dist[slot] = max(0.0, parent_dist - spawned * 6.0)
+                                    b_x[slot] = hit_x
+                                    b_y[slot] = hit_y
+                                    b_camo[slot] = parent_camo
+                                    b_immun[slot] = c_imm
+                                    b_rbe[slot] = c_hp
+                                    b_children_count[slot] = 0
+                                    b_is_moab[slot] = 0
+                                    spawned += 1
+                                    if spawned >= children:
+                                        break
