@@ -2,7 +2,7 @@ import os
 import json
 import time
 import numpy as np
-from typing import Dict, Any, Optional, Tuple
+from typing import Dict, Any, Tuple
 
 
 class AIMemoryVault:

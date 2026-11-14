@@ -1,5 +1,5 @@
 import numpy as np
-from numba import njit, int32, boolean
+from numba import njit
 
 # Bitmasks de Tipos de Dano e Imunidades
 DMG_SHARP = 1 << 0

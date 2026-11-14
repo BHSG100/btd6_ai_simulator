@@ -2,7 +2,7 @@ import pygame
 import pygame.gfxdraw
 import numpy as np
 from ai.smart_env import TOWER_CATALOG
-from core.engine import DMG_NORMAL, DMG_ENERGY, DMG_EXPLOSION
+from core.engine import DMG_NORMAL, DMG_ENERGY
 
 TOWER_COLORS = [
     (56, 189, 248),   # Dart Crossbow - Cyan
