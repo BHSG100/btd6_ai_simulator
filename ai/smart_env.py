@@ -57,18 +57,16 @@ TOWER_CATALOG = [
     ("Farm 2-3-0 (Monkey Bank)", 4900, 60.0, 0.0, 0.0, 0, 99.0, 0, DMG_SHARP, 0.0, 0, 0, 420.0),
     ("Sniper 4-0-2 (Maim MOAB)", 6800, 999.0, 18.0, 35.0, 2, 1.35, 1, DMG_NORMAL, 0.0, 0, 0, 0.0),
 ]
-
-
 class BTD6TacticalEnv(gym.Env):
-    """Ambiente Gymnasium com Action Masking, Macro-Stepping e Reward Shaping Denso."""
+    """Ambiente v2.4 com Árvore 5-2-0, Venda 70%, Rondas 1-100 (DDT/BAD), Modo CHIMPS e Previsão."""
 
-    def __init__(self, max_rounds=80):
+    def __init__(self, max_rounds=100, chimps_mode=False):
         super().__init__()
-        self.max_rounds = max_rounds
+        self.chimps_mode = chimps_mode
+        self.max_rounds = 100 if chimps_mode else max_rounds
         self.max_bloons = 512
         self.max_towers = 24
         self.max_lasers = 64
-
         # Trilha estilo Monkey Meadow com curvas estratégicas
         self.wp_coords = np.array(
             [

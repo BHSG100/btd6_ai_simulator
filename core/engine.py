@@ -295,7 +295,7 @@ def step_macro_ticks_jit(
                                     b_immun[slot] = c_imm
                                     b_rbe[slot] = c_hp
                                     b_children_count[slot] = 0
-                                    b_is_moab[slot] = 0
+                                    b_is_moab[slot] = 1 if c_hp >= 200.0 else 0
                                     spawned += 1
                                     if spawned >= children:
                                         break
